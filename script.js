@@ -200,6 +200,7 @@ function setRandomTheme() {
   if (!list || list.length === 0) return;
 
   let newTheme;
+
   if (list.length === 1) {
     newTheme = list[0];
   } else {
@@ -280,6 +281,11 @@ function renderPlay() {
   const grid = document.createElement("div");
   grid.className = "vote-grid";
 
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "次へ";
+  nextBtn.className = "primary footer-btn";
+  nextBtn.disabled = true;
+
   GameState.players.forEach(p => {
     if (p === player) return;
 
@@ -292,6 +298,7 @@ function renderPlay() {
       document.querySelectorAll(".vote-btn")
         .forEach(b => b.classList.remove("selected"));
       btn.classList.add("selected");
+      nextBtn.disabled = false;
     };
 
     grid.appendChild(btn);
@@ -299,9 +306,6 @@ function renderPlay() {
 
   screen.appendChild(grid);
 
-  const nextBtn = document.createElement("button");
-  nextBtn.textContent = "次へ";
-  nextBtn.className = "primary footer-btn";
   nextBtn.onclick = () => {
     if (!selectedVote) return;
 
@@ -354,35 +358,67 @@ function renderResult() {
     const actual = GameState.votes[p] || 0;
     const predicted = GameState.predictions[p] || 0;
     const error = Math.abs(actual - predicted);
-    return { name: p, actual, error };
+    return { name: p, actual, predicted, error };
   });
 
   const voteRank = [...results].sort((a, b) => b.actual - a.actual);
-  const errorRank = [...results].sort((a, b) => a.error - b.error);
+  const errorRank = [...results].sort((a, b) => b.error - a.error);
 
   const title = document.createElement("h2");
   title.textContent = "結果";
   screen.appendChild(title);
 
+  const voteSection = document.createElement("div");
+  voteSection.className = "result-section";
+
   const vTitle = document.createElement("h3");
   vTitle.textContent = "投票数ランキング";
-  screen.appendChild(vTitle);
+  voteSection.appendChild(vTitle);
 
   voteRank.forEach(r => {
-    const div = document.createElement("div");
-    div.textContent = `${r.name} : ${r.actual}票`;
-    screen.appendChild(div);
+    const card = document.createElement("div");
+    card.className = "result-card";
+
+    const name = document.createElement("div");
+    name.className = "result-name";
+    name.textContent = `${r.name}：${r.actual}票`;
+
+    const sub = document.createElement("div");
+    sub.className = "result-sub";
+    sub.textContent = `予想 ${r.predicted} / 実際 ${r.actual} / 誤差 ${r.error}`;
+
+    card.appendChild(name);
+    card.appendChild(sub);
+    voteSection.appendChild(card);
   });
+
+  screen.appendChild(voteSection);
+
+  const errorSection = document.createElement("div");
+  errorSection.className = "result-section";
 
   const eTitle = document.createElement("h3");
-  eTitle.textContent = "誤差ランキング";
-  screen.appendChild(eTitle);
+  eTitle.textContent = "誤差ランキング（多い順）";
+  errorSection.appendChild(eTitle);
 
   errorRank.forEach(r => {
-    const div = document.createElement("div");
-    div.textContent = `${r.name} : 誤差 ${r.error}`;
-    screen.appendChild(div);
+    const card = document.createElement("div");
+    card.className = "result-card";
+
+    const name = document.createElement("div");
+    name.className = "result-name";
+    name.textContent = `${r.name}：誤差 ${r.error}`;
+
+    const sub = document.createElement("div");
+    sub.className = "result-sub";
+    sub.textContent = `予想 ${r.predicted} / 実際 ${r.actual}`;
+
+    card.appendChild(name);
+    card.appendChild(sub);
+    errorSection.appendChild(card);
   });
+
+  screen.appendChild(errorSection);
 
   const btn = document.createElement("button");
   btn.textContent = "お題へ戻る";
