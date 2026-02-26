@@ -361,8 +361,8 @@ function renderResult() {
     return { name: p, actual, predicted, error };
   });
 
+  /* ===== 投票数ランキング（票数のみ） ===== */
   const voteRank = [...results].sort((a, b) => b.actual - a.actual);
-  const errorRank = [...results].sort((a, b) => b.error - a.error);
 
   const title = document.createElement("h2");
   title.textContent = "結果";
@@ -375,47 +375,54 @@ function renderResult() {
   vTitle.textContent = "投票数ランキング";
   voteSection.appendChild(vTitle);
 
-  voteRank.forEach(r => {
-    const card = document.createElement("div");
-    card.className = "result-card";
-
-    const name = document.createElement("div");
-    name.className = "result-name";
-    name.textContent = `${r.name}：${r.actual}票`;
-
-    const sub = document.createElement("div");
-    sub.className = "result-sub";
-    sub.textContent = `予想 ${r.predicted} / 実際 ${r.actual} / 誤差 ${r.error}`;
-
-    card.appendChild(name);
-    card.appendChild(sub);
-    voteSection.appendChild(card);
+  voteRank.forEach((r, index) => {
+    const div = document.createElement("div");
+    div.className = "result-card";
+    div.textContent = `${index + 1}位　${r.name}：${r.actual}票`;
+    voteSection.appendChild(div);
   });
 
   screen.appendChild(voteSection);
+
+  /* ===== 誤差ランキング（多い順・飛ばし順位） ===== */
+  const errorRank = [...results].sort((a, b) => b.error - a.error);
 
   const errorSection = document.createElement("div");
   errorSection.className = "result-section";
 
   const eTitle = document.createElement("h3");
-  eTitle.textContent = "誤差ランキング（多い順）";
+  eTitle.textContent = "誤差ランキング";
   errorSection.appendChild(eTitle);
 
-  errorRank.forEach(r => {
-    const card = document.createElement("div");
-    card.className = "result-card";
+  let currentRank = 0;
+  let lastError = null;
+
+  errorRank.forEach((r, index) => {
+    if (r.error !== lastError) {
+      currentRank = index + 1;
+      lastError = r.error;
+    }
+
+    const row = document.createElement("div");
+    row.className = "error-row";
+
+    const rank = document.createElement("div");
+    rank.className = "rank";
+    rank.textContent = `${currentRank}位`;
 
     const name = document.createElement("div");
-    name.className = "result-name";
-    name.textContent = `${r.name}：誤差 ${r.error}`;
+    name.className = "error-name";
+    name.textContent = r.name;
 
-    const sub = document.createElement("div");
-    sub.className = "result-sub";
-    sub.textContent = `予想 ${r.predicted} / 実際 ${r.actual}`;
+    const value = document.createElement("div");
+    value.className = "error-value";
+    value.textContent = `誤差 ${r.error}`;
 
-    card.appendChild(name);
-    card.appendChild(sub);
-    errorSection.appendChild(card);
+    row.appendChild(rank);
+    row.appendChild(name);
+    row.appendChild(value);
+
+    errorSection.appendChild(row);
   });
 
   screen.appendChild(errorSection);
