@@ -1,9 +1,6 @@
 const GameState = {
   players: [],
-  predictions: {},
-  votes: {},
   phase: "setup",
-  currentPlayerIndex: 0,
   theme: "",
   themes: [
     "一番すぐ寝そう",
@@ -11,151 +8,269 @@ const GameState = {
     "一番将来成功しそう",
     "一番秘密を持ってそう",
     "一番モテそう"
-  ]
+  ],
+  currentIndex: 0,
+  predictions: {},
+  votes: {}
 };
 
-function render() {
-  const content = document.getElementById("content");
-  content.innerHTML = "";
+const screen = document.getElementById("screen");
 
-  if (GameState.phase === "setup") renderSetup(content);
-  if (GameState.phase === "predict") renderPredict(content);
-  if (GameState.phase === "vote") renderVote(content);
-  if (GameState.phase === "result") renderResult(content);
+function render() {
+  screen.innerHTML = "";
+
+  if (GameState.phase === "setup") renderSetup();
+  if (GameState.phase === "theme") renderTheme();
+  if (GameState.phase === "play") renderPlay();
+  if (GameState.phase === "result") renderResult();
 }
 
-function renderSetup(el) {
+/* ===== SETUP ===== */
+
+function renderSetup() {
+  const title = document.createElement("h1");
+  title.textContent = "プレイヤー登録";
+  screen.appendChild(title);
+
   const input = document.createElement("input");
+  input.placeholder = "名前を入力";
+  screen.appendChild(input);
+
   const addBtn = document.createElement("button");
   addBtn.textContent = "追加";
+  addBtn.className = "primary";
+  screen.appendChild(addBtn);
 
-  addBtn.onclick = () => {
-    if (!input.value) return;
-    GameState.players.push({ name: input.value });
+  function addPlayer() {
+    if (!input.value.trim()) return;
+    GameState.players.push(input.value.trim());
     input.value = "";
     render();
-  };
+  }
 
-  el.appendChild(input);
-  el.appendChild(addBtn);
+  addBtn.onclick = addPlayer;
 
-  GameState.players.forEach((p, i) => {
-    const div = document.createElement("div");
-    div.textContent = p.name;
-    el.appendChild(div);
+  input.addEventListener("keydown", e => {
+    if (e.key === "Enter") addPlayer();
+  });
+
+  GameState.players.forEach((name, i) => {
+    const row = document.createElement("div");
+    row.className = "player-row";
+
+    const span = document.createElement("span");
+    span.textContent = name;
+
+    const del = document.createElement("button");
+    del.textContent = "削除";
+    del.className = "secondary";
+    del.onclick = () => {
+      GameState.players.splice(i, 1);
+      render();
+    };
+
+    row.appendChild(span);
+    row.appendChild(del);
+    screen.appendChild(row);
   });
 
   if (GameState.players.length >= 3) {
     const startBtn = document.createElement("button");
-    startBtn.textContent = "開始";
-    startBtn.onclick = startRound;
-    el.appendChild(startBtn);
+    startBtn.textContent = "お題へ";
+    startBtn.className = "primary footer-btn";
+    startBtn.onclick = () => {
+      GameState.phase = "theme";
+      setRandomTheme();
+      render();
+    };
+    screen.appendChild(startBtn);
   }
 }
 
-function startRound() {
+/* ===== THEME ===== */
+
+function renderTheme() {
+  const title = document.createElement("h1");
+  title.textContent = "お題";
+  screen.appendChild(title);
+
+  const themeText = document.createElement("h2");
+  themeText.textContent = GameState.theme;
+  screen.appendChild(themeText);
+
+  const changeBtn = document.createElement("button");
+  changeBtn.textContent = "お題変更";
+  changeBtn.className = "secondary";
+  changeBtn.onclick = () => {
+    setRandomTheme();
+    render();
+  };
+  screen.appendChild(changeBtn);
+
+  const startBtn = document.createElement("button");
+  startBtn.textContent = "回す";
+  startBtn.className = "primary";
+  startBtn.onclick = startRound;
+  screen.appendChild(startBtn);
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "トップに戻る";
+  backBtn.className = "secondary footer-btn";
+  backBtn.onclick = () => {
+    GameState.phase = "setup";
+    render();
+  };
+  screen.appendChild(backBtn);
+}
+
+function setRandomTheme() {
   GameState.theme =
     GameState.themes[Math.floor(Math.random() * GameState.themes.length)];
+}
 
+/* ===== PLAY ===== */
+
+function startRound() {
+  GameState.currentIndex = 0;
   GameState.predictions = {};
   GameState.votes = {};
-  GameState.currentPlayerIndex = 0;
-  GameState.phase = "predict";
+  GameState.phase = "play";
   render();
 }
 
-function renderPredict(el) {
-  const player = GameState.players[GameState.currentPlayerIndex];
+function renderPlay() {
+  const player = GameState.players[GameState.currentIndex];
 
   const title = document.createElement("h2");
   title.textContent = GameState.theme;
-  el.appendChild(title);
+  screen.appendChild(title);
 
-  const label = document.createElement("p");
-  label.textContent = `${player.name}さん：自分は何票入る？`;
-  el.appendChild(label);
+  const name = document.createElement("p");
+  name.textContent = player + " さん";
+  screen.appendChild(name);
 
-  const input = document.createElement("input");
-  input.type = "number";
-  input.min = 0;
-  input.max = GameState.players.length - 1;
-  el.appendChild(input);
+  let prediction = 0;
+  let selectedVote = null;
 
-  const btn = document.createElement("button");
-  btn.textContent = "決定";
-  btn.onclick = () => {
-    GameState.predictions[player.name] = Number(input.value);
-    GameState.currentPlayerIndex++;
+  /* 予想UI */
+  const counter = document.createElement("div");
+  counter.className = "counter";
 
-    if (GameState.currentPlayerIndex >= GameState.players.length) {
-      GameState.currentPlayerIndex = 0;
-      GameState.phase = "vote";
-    }
-    render();
+  const minus = document.createElement("button");
+  minus.textContent = "−";
+
+  const num = document.createElement("div");
+  num.textContent = prediction;
+
+  const plus = document.createElement("button");
+  plus.textContent = "+";
+
+  minus.onclick = () => {
+    if (prediction > 0) prediction--;
+    num.textContent = prediction;
   };
-  el.appendChild(btn);
-}
 
-function renderVote(el) {
-  const player = GameState.players[GameState.currentPlayerIndex];
+  plus.onclick = () => {
+    if (prediction < GameState.players.length - 1) prediction++;
+    num.textContent = prediction;
+  };
 
-  const title = document.createElement("h2");
-  title.textContent = GameState.theme;
-  el.appendChild(title);
+  counter.appendChild(minus);
+  counter.appendChild(num);
+  counter.appendChild(plus);
+  screen.appendChild(counter);
 
-  const label = document.createElement("p");
-  label.textContent = `${player.name}さん：誰に投票する？`;
-  el.appendChild(label);
+  /* 投票UI */
+  const grid = document.createElement("div");
+  grid.className = "vote-grid";
 
   GameState.players.forEach(p => {
-    if (p.name === player.name) return;
+    if (p === player) return;
 
     const btn = document.createElement("button");
-    btn.textContent = p.name;
-    btn.onclick = () => {
-      GameState.votes[p.name] = (GameState.votes[p.name] || 0) + 1;
-      GameState.currentPlayerIndex++;
+    btn.textContent = p;
+    btn.className = "vote-btn";
 
-      if (GameState.currentPlayerIndex >= GameState.players.length) {
-        GameState.phase = "result";
-      }
-      render();
+    btn.onclick = () => {
+      selectedVote = p;
+      document.querySelectorAll(".vote-btn")
+        .forEach(b => b.classList.remove("selected"));
+      btn.classList.add("selected");
     };
-    el.appendChild(btn);
+
+    grid.appendChild(btn);
   });
+
+  screen.appendChild(grid);
+
+  /* 次へ */
+  const nextBtn = document.createElement("button");
+  nextBtn.textContent = "次へ";
+  nextBtn.className = "primary footer-btn";
+  nextBtn.onclick = () => {
+    if (selectedVote == null) return;
+
+    GameState.predictions[player] = prediction;
+    GameState.votes[selectedVote] =
+      (GameState.votes[selectedVote] || 0) + 1;
+
+    GameState.currentIndex++;
+
+    if (GameState.currentIndex >= GameState.players.length) {
+      GameState.phase = "result";
+    }
+
+    render();
+  };
+
+  screen.appendChild(nextBtn);
 }
 
-function renderResult(el) {
-  const results = [];
+/* ===== RESULT ===== */
 
-  GameState.players.forEach(p => {
-    const actual = GameState.votes[p.name] || 0;
-    const predicted = GameState.predictions[p.name] || 0;
+function renderResult() {
+  const results = GameState.players.map(p => {
+    const actual = GameState.votes[p] || 0;
+    const predicted = GameState.predictions[p] || 0;
     const error = Math.abs(actual - predicted);
-
-    results.push({
-      name: p.name,
-      actual,
-      predicted,
-      error
-    });
+    return { name: p, actual, predicted, error };
   });
+
+  const voteRank = [...results].sort((a, b) => b.actual - a.actual);
+  const errorRank = [...results].sort((a, b) => a.error - b.error);
 
   const title = document.createElement("h2");
   title.textContent = "結果";
-  el.appendChild(title);
+  screen.appendChild(title);
 
-  results.forEach(r => {
+  const voteTitle = document.createElement("h3");
+  voteTitle.textContent = "投票数ランキング";
+  screen.appendChild(voteTitle);
+
+  voteRank.forEach(r => {
     const div = document.createElement("div");
-    div.textContent =
-      `${r.name} 予想:${r.predicted} 実際:${r.actual} 誤差:${r.error}`;
-    el.appendChild(div);
+    div.textContent = `${r.name} : ${r.actual}票`;
+    screen.appendChild(div);
+  });
+
+  const errorTitle = document.createElement("h3");
+  errorTitle.textContent = "誤差ランキング";
+  screen.appendChild(errorTitle);
+
+  errorRank.forEach(r => {
+    const div = document.createElement("div");
+    div.textContent = `${r.name} : 誤差 ${r.error}`;
+    screen.appendChild(div);
   });
 
   const nextBtn = document.createElement("button");
-  nextBtn.textContent = "次のラウンド";
-  nextBtn.onclick = startRound;
-  el.appendChild(nextBtn);
+  nextBtn.textContent = "お題へ戻る";
+  nextBtn.className = "primary footer-btn";
+  nextBtn.onclick = () => {
+    GameState.phase = "theme";
+    render();
+  };
+  screen.appendChild(nextBtn);
 }
 
 render();
