@@ -406,21 +406,24 @@ function renderResult() {
     const row = document.createElement("div");
     row.className = "error-row";
 
-    const rank = document.createElement("div");
-    rank.className = "rank";
-    rank.textContent = `${currentRank}位`;
+    const top = document.createElement("div");
+    top.className = "error-top";
 
-    const name = document.createElement("div");
-    name.className = "error-name";
-    name.textContent = r.name;
+    const rankName = document.createElement("div");
+    rankName.textContent = `${currentRank}位　${r.name}`;
 
-    const value = document.createElement("div");
-    value.className = "error-value";
-    value.textContent = `誤差 ${r.error} (予想 ${r.predicted} / 票数 ${r.actual})`;
+    const errorValue = document.createElement("div");
+    errorValue.textContent = `誤差 ${r.error}`;
 
-    row.appendChild(rank);
-    row.appendChild(name);
-    row.appendChild(value);
+    top.appendChild(rankName);
+    top.appendChild(errorValue);
+
+    const sub = document.createElement("div");
+    sub.className = "error-sub";
+    sub.textContent = `(予想 ${r.predicted} / 票数 ${r.actual})`;
+
+    row.appendChild(top);
+    row.appendChild(sub);
 
     errorSection.appendChild(row);
   });
