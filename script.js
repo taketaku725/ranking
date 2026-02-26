@@ -168,24 +168,26 @@ function renderTheme() {
 
   screen.appendChild(select);
 
+  /* お題カード */
   const card = document.createElement("div");
   card.className = "theme-card";
   card.textContent = GameState.theme;
   screen.appendChild(card);
 
+  /* お題変更ボタン（真下中央・間隔少なめ） */
   const changeBtn = document.createElement("button");
   changeBtn.textContent = "お題変更";
-  changeBtn.className = "secondary";
+  changeBtn.className = "secondary center-btn";
   changeBtn.onclick = () => {
     setRandomTheme();
     render();
   };
   screen.appendChild(changeBtn);
 
+  /* 開始ボタン（さらに下中央・少し間を空ける） */
   const startBtn = document.createElement("button");
   startBtn.textContent = "開始";
-  startBtn.className = "primary";
-  startBtn.style.marginTop = "40px";
+  startBtn.className = "primary start-btn";
   startBtn.onclick = startRound;
   screen.appendChild(startBtn);
 }
