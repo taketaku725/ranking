@@ -1,20 +1,35 @@
 const GameState = {
   players: [],
-  phase: "setup",
+  phase: "setup", // setup | theme | play | result
+  themes: {},
+  currentCategory: "",
   theme: "",
-  themes: [
-    "一番すぐ寝そう",
-    "一番裏切りそう",
-    "一番将来成功しそう",
-    "一番秘密を持ってそう",
-    "一番モテそう"
-  ],
+  lastTheme: "",
   currentIndex: 0,
   predictions: {},
   votes: {}
 };
 
 const screen = document.getElementById("screen");
+
+/* =========================
+   初期化
+========================= */
+
+async function init() {
+  await loadThemes();
+  GameState.currentCategory = Object.keys(GameState.themes)[0];
+  render();
+}
+
+async function loadThemes() {
+  const res = await fetch("themes.json");
+  GameState.themes = await res.json();
+}
+
+/* =========================
+   共通描画
+========================= */
 
 function render() {
   screen.innerHTML = "";
@@ -25,7 +40,9 @@ function render() {
   if (GameState.phase === "result") renderResult();
 }
 
-/* ===== SETUP ===== */
+/* =========================
+   SETUP
+========================= */
 
 function renderSetup() {
   const title = document.createElement("h1");
@@ -42,14 +59,14 @@ function renderSetup() {
   screen.appendChild(addBtn);
 
   function addPlayer() {
-    if (!input.value.trim()) return;
-    GameState.players.push(input.value.trim());
+    const name = input.value.trim();
+    if (!name) return;
+    GameState.players.push(name);
     input.value = "";
     render();
   }
 
   addBtn.onclick = addPlayer;
-
   input.addEventListener("keydown", e => {
     if (e.key === "Enter") addPlayer();
   });
@@ -87,13 +104,36 @@ function renderSetup() {
   }
 }
 
-/* ===== THEME ===== */
+/* =========================
+   THEME
+========================= */
 
 function renderTheme() {
   const title = document.createElement("h1");
   title.textContent = "お題";
   screen.appendChild(title);
 
+  // カテゴリ選択
+  const select = document.createElement("select");
+
+  Object.keys(GameState.themes).forEach(cat => {
+    const option = document.createElement("option");
+    option.value = cat;
+    option.textContent = cat;
+    select.appendChild(option);
+  });
+
+  select.value = GameState.currentCategory;
+
+  select.onchange = () => {
+    GameState.currentCategory = select.value;
+    setRandomTheme();
+    render();
+  };
+
+  screen.appendChild(select);
+
+  // お題表示
   const themeText = document.createElement("h2");
   themeText.textContent = GameState.theme;
   screen.appendChild(themeText);
@@ -124,11 +164,26 @@ function renderTheme() {
 }
 
 function setRandomTheme() {
-  GameState.theme =
-    GameState.themes[Math.floor(Math.random() * GameState.themes.length)];
+  const list = GameState.themes[GameState.currentCategory];
+  if (!list || list.length === 0) return;
+
+  let newTheme;
+
+  if (list.length === 1) {
+    newTheme = list[0];
+  } else {
+    do {
+      newTheme = list[Math.floor(Math.random() * list.length)];
+    } while (newTheme === GameState.lastTheme);
+  }
+
+  GameState.theme = newTheme;
+  GameState.lastTheme = newTheme;
 }
 
-/* ===== PLAY ===== */
+/* =========================
+   PLAY
+========================= */
 
 function startRound() {
   GameState.currentIndex = 0;
@@ -226,7 +281,9 @@ function renderPlay() {
   screen.appendChild(nextBtn);
 }
 
-/* ===== RESULT ===== */
+/* =========================
+   RESULT
+========================= */
 
 function renderResult() {
   const results = GameState.players.map(p => {
@@ -268,9 +325,10 @@ function renderResult() {
   nextBtn.className = "primary footer-btn";
   nextBtn.onclick = () => {
     GameState.phase = "theme";
+    setRandomTheme();
     render();
   };
   screen.appendChild(nextBtn);
 }
 
-render();
+init();
