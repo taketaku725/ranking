@@ -216,12 +216,25 @@ select {
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #444;
-  padding: 10px 0;
+  padding: 12px 0;
   font-size: 16px; /* 全員同サイズ */
 }
 
 .error-row:last-child {
   border-bottom: none;
+}
+
+.error-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.error-sub {
+  text-align: right;
+  font-size: 14px;
+  color: #ccc;
+  white-space: nowrap; /* ()内は改行させない */
+  margin-top: 4px;
 }
 
 .rank {
