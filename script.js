@@ -416,7 +416,7 @@ function renderResult() {
 
     const value = document.createElement("div");
     value.className = "error-value";
-    value.textContent = `誤差 ${r.error}`;
+    value.textContent = `誤差 ${r.error} (予想 ${r.predicted} / 票数 ${r.actual})`;
 
     row.appendChild(rank);
     row.appendChild(name);
