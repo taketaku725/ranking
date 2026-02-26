@@ -210,3 +210,30 @@ select {
   font-size: 14px;
   color: #ccc;
 }
+
+/* 横並び誤差ランキング */
+.error-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #444;
+  padding: 10px 0;
+  font-size: 16px; /* 全員同サイズ */
+}
+
+.error-row:last-child {
+  border-bottom: none;
+}
+
+.rank {
+  width: 50px;
+}
+
+.error-name {
+  flex: 1;
+  text-align: left;
+}
+
+.error-value {
+  width: 80px;
+  text-align: right;
+}
