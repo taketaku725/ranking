@@ -361,91 +361,103 @@ function renderResult() {
     return { name: p, actual, predicted, error };
   });
 
-  /* ===== 投票数ランキング（飛ばし順位・統一形式） ===== */
-  const voteRank = [...results].sort((a, b) => b.actual - a.actual);
+  const title = document.createElement("h2");
+  title.textContent = "結果";
+  screen.appendChild(title);
 
-  const voteSection = document.createElement("div");
-  voteSection.className = "result-section";
+  /* =======================
+     投票数ランキング
+  ======================= */
+  {
+    const voteRank = [...results].sort((a, b) => b.actual - a.actual);
 
-  const vTitle = document.createElement("h3");
-  vTitle.textContent = "投票数ランキング";
-  voteSection.appendChild(vTitle);
+    const voteSection = document.createElement("div");
+    voteSection.className = "result-section";
 
-  let currentRank = 0;
-  let lastVote = null;
+    const vTitle = document.createElement("h3");
+    vTitle.textContent = "投票数ランキング";
+    voteSection.appendChild(vTitle);
 
-  voteRank.forEach((r, index) => {
-    if (r.actual !== lastVote) {
-      currentRank = index + 1;
-      lastVote = r.actual;
-    }
+    let currentRank = 0;
+    let lastVote = null;
 
-    const row = document.createElement("div");
-    row.className = "error-row"; // 誤差と同じ構造を使う
+    voteRank.forEach((r, index) => {
+      if (r.actual !== lastVote) {
+        currentRank = index + 1;
+        lastVote = r.actual;
+      }
 
-    const top = document.createElement("div");
-    top.className = "error-top";
+      const row = document.createElement("div");
+      row.className = "error-row";
 
-    const rankName = document.createElement("div");
-    rankName.textContent = `${currentRank}位　${r.name}`;
+      const top = document.createElement("div");
+      top.className = "error-top";
 
-    const voteValue = document.createElement("div");
-    voteValue.textContent = `${r.actual}票`;
+      const rankName = document.createElement("div");
+      rankName.textContent = `${currentRank}位　${r.name}`;
 
-    top.appendChild(rankName);
-    top.appendChild(voteValue);
+      const voteValue = document.createElement("div");
+      voteValue.textContent = `${r.actual}票`;
 
-    row.appendChild(top);
-    voteSection.appendChild(row);
-  });
+      top.appendChild(rankName);
+      top.appendChild(voteValue);
+      row.appendChild(top);
 
-  screen.appendChild(voteSection);
+      voteSection.appendChild(row);
+    });
 
-  /* ===== 誤差ランキング（多い順・飛ばし順位） ===== */
-  const errorRank = [...results].sort((a, b) => b.error - a.error);
+    screen.appendChild(voteSection);
+  }
 
-  const errorSection = document.createElement("div");
-  errorSection.className = "result-section";
+  /* =======================
+     誤差ランキング
+  ======================= */
+  {
+    const errorRank = [...results].sort((a, b) => b.error - a.error);
 
-  const eTitle = document.createElement("h3");
-  eTitle.textContent = "誤差ランキング";
-  errorSection.appendChild(eTitle);
+    const errorSection = document.createElement("div");
+    errorSection.className = "result-section";
 
-  let currentRank = 0;
-  let lastError = null;
+    const eTitle = document.createElement("h3");
+    eTitle.textContent = "誤差ランキング";
+    errorSection.appendChild(eTitle);
 
-  errorRank.forEach((r, index) => {
-    if (r.error !== lastError) {
-      currentRank = index + 1;
-      lastError = r.error;
-    }
+    let currentRank = 0;
+    let lastError = null;
 
-    const row = document.createElement("div");
-    row.className = "error-row";
+    errorRank.forEach((r, index) => {
+      if (r.error !== lastError) {
+        currentRank = index + 1;
+        lastError = r.error;
+      }
 
-    const top = document.createElement("div");
-    top.className = "error-top";
+      const row = document.createElement("div");
+      row.className = "error-row";
 
-    const rankName = document.createElement("div");
-    rankName.textContent = `${currentRank}位　${r.name}`;
+      const top = document.createElement("div");
+      top.className = "error-top";
 
-    const errorValue = document.createElement("div");
-    errorValue.textContent = `誤差 ${r.error}`;
+      const rankName = document.createElement("div");
+      rankName.textContent = `${currentRank}位　${r.name}`;
 
-    top.appendChild(rankName);
-    top.appendChild(errorValue);
+      const errorValue = document.createElement("div");
+      errorValue.textContent = `誤差 ${r.error}`;
 
-    const sub = document.createElement("div");
-    sub.className = "error-sub";
-    sub.textContent = `(予想 ${r.predicted} / 票数 ${r.actual})`;
+      top.appendChild(rankName);
+      top.appendChild(errorValue);
 
-    row.appendChild(top);
-    row.appendChild(sub);
+      const sub = document.createElement("div");
+      sub.className = "error-sub";
+      sub.textContent = `(予想 ${r.predicted} / 票数 ${r.actual})`;
 
-    errorSection.appendChild(row);
-  });
+      row.appendChild(top);
+      row.appendChild(sub);
 
-  screen.appendChild(errorSection);
+      errorSection.appendChild(row);
+    });
+
+    screen.appendChild(errorSection);
+  }
 
   const btn = document.createElement("button");
   btn.textContent = "お題へ戻る";
