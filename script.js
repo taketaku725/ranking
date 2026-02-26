@@ -1,6 +1,6 @@
 const GameState = {
   players: [],
-  phase: "setup",
+  phase: "setup", // setup | theme | play | summary | result
   themes: {},
   currentCategory: "",
   theme: "",
@@ -12,7 +12,9 @@ const GameState = {
 
 const screen = document.getElementById("screen");
 
-/* ===== 初期化 ===== */
+/* =======================
+   初期化
+======================= */
 
 async function init() {
   loadPlayers();
@@ -25,7 +27,6 @@ async function loadThemes() {
   const res = await fetch("themes.json");
   const data = await res.json();
 
-  // 特殊カテゴリ生成
   const allExceptAdult = [];
   const allIncludingAdult = [];
 
@@ -48,12 +49,12 @@ function savePlayers() {
 
 function loadPlayers() {
   const saved = localStorage.getItem("players");
-  if (saved) {
-    GameState.players = JSON.parse(saved);
-  }
+  if (saved) GameState.players = JSON.parse(saved);
 }
 
-/* ===== 共通描画 ===== */
+/* =======================
+   共通描画
+======================= */
 
 function render() {
   screen.innerHTML = "";
@@ -61,10 +62,13 @@ function render() {
   if (GameState.phase === "setup") renderSetup();
   if (GameState.phase === "theme") renderTheme();
   if (GameState.phase === "play") renderPlay();
+  if (GameState.phase === "summary") renderSummary();
   if (GameState.phase === "result") renderResult();
 }
 
-/* ===== SETUP ===== */
+/* =======================
+   SETUP
+======================= */
 
 function renderSetup() {
   const title = document.createElement("h1");
@@ -133,7 +137,9 @@ function renderSetup() {
   }
 }
 
-/* ===== THEME ===== */
+/* =======================
+   THEME
+======================= */
 
 function renderTheme() {
   const back = document.createElement("button");
@@ -168,13 +174,11 @@ function renderTheme() {
 
   screen.appendChild(select);
 
-  /* お題カード */
   const card = document.createElement("div");
   card.className = "theme-card";
   card.textContent = GameState.theme;
   screen.appendChild(card);
 
-  /* お題変更ボタン（真下中央・間隔少なめ） */
   const changeBtn = document.createElement("button");
   changeBtn.textContent = "お題変更";
   changeBtn.className = "secondary center-btn";
@@ -184,7 +188,6 @@ function renderTheme() {
   };
   screen.appendChild(changeBtn);
 
-  /* 開始ボタン（さらに下中央・少し間を空ける） */
   const startBtn = document.createElement("button");
   startBtn.textContent = "開始";
   startBtn.className = "primary start-btn";
@@ -209,7 +212,9 @@ function setRandomTheme() {
   GameState.lastTheme = newTheme;
 }
 
-/* ===== PLAY ===== */
+/* =======================
+   PLAY
+======================= */
 
 function startRound() {
   GameState.currentIndex = 0;
@@ -307,7 +312,7 @@ function renderPlay() {
     GameState.currentIndex++;
 
     if (GameState.currentIndex >= GameState.players.length) {
-      GameState.phase = "result";
+      GameState.phase = "summary";
     }
 
     render();
@@ -316,7 +321,33 @@ function renderPlay() {
   screen.appendChild(nextBtn);
 }
 
-/* ===== RESULT ===== */
+/* =======================
+   SUMMARY
+======================= */
+
+function renderSummary() {
+  const wrapper = document.createElement("div");
+  wrapper.className = "summary-screen";
+
+  const title = document.createElement("h1");
+  title.textContent = "集計完了";
+  wrapper.appendChild(title);
+
+  const btn = document.createElement("button");
+  btn.textContent = "結果を見る";
+  btn.className = "primary footer-btn";
+  btn.onclick = () => {
+    GameState.phase = "result";
+    render();
+  };
+
+  wrapper.appendChild(btn);
+  screen.appendChild(wrapper);
+}
+
+/* =======================
+   RESULT
+======================= */
 
 function renderResult() {
   const results = GameState.players.map(p => {
