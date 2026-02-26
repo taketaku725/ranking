@@ -361,12 +361,8 @@ function renderResult() {
     return { name: p, actual, predicted, error };
   });
 
-  /* ===== 投票数ランキング（票数のみ） ===== */
+  /* ===== 投票数ランキング（飛ばし順位・統一形式） ===== */
   const voteRank = [...results].sort((a, b) => b.actual - a.actual);
-
-  const title = document.createElement("h2");
-  title.textContent = "結果";
-  screen.appendChild(title);
 
   const voteSection = document.createElement("div");
   voteSection.className = "result-section";
@@ -375,11 +371,32 @@ function renderResult() {
   vTitle.textContent = "投票数ランキング";
   voteSection.appendChild(vTitle);
 
+  let currentRank = 0;
+  let lastVote = null;
+
   voteRank.forEach((r, index) => {
-    const div = document.createElement("div");
-    div.className = "result-card";
-    div.textContent = `${index + 1}位　${r.name}：${r.actual}票`;
-    voteSection.appendChild(div);
+    if (r.actual !== lastVote) {
+      currentRank = index + 1;
+      lastVote = r.actual;
+    }
+
+    const row = document.createElement("div");
+    row.className = "error-row"; // 誤差と同じ構造を使う
+
+    const top = document.createElement("div");
+    top.className = "error-top";
+
+    const rankName = document.createElement("div");
+    rankName.textContent = `${currentRank}位　${r.name}`;
+
+    const voteValue = document.createElement("div");
+    voteValue.textContent = `${r.actual}票`;
+
+    top.appendChild(rankName);
+    top.appendChild(voteValue);
+
+    row.appendChild(top);
+    voteSection.appendChild(row);
   });
 
   screen.appendChild(voteSection);
