@@ -38,7 +38,7 @@ h2 {
   padding: 24px;
   text-align: center;
   font-size: 22px;
-  margin: 20px 0;
+  margin: 20px 0 10px;
   background: #1e1e1e;
 }
 
@@ -90,6 +90,20 @@ button {
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
+}
+
+.center-btn {
+  display: block;
+  margin: 10px auto 0;
+  width: 70%;
+  max-width: 260px;
+}
+
+.start-btn {
+  display: block;
+  margin: 30px auto 0;
+  width: 70%;
+  max-width: 260px;
 }
 
 .counter {
