@@ -136,6 +136,9 @@ function renderSetup() {
     screen.appendChild(btn);
   }
 
+  // =======================
+  // 遊び方
+  // =======================
   const rules = document.createElement("div");
   rules.className = "rules";
 
@@ -143,22 +146,32 @@ function renderSetup() {
   ruleTitle.textContent = "【遊び方】";
   rules.appendChild(ruleTitle);
 
+  // ルール1
   const rule1Text = document.createElement("p");
   rule1Text.textContent = "1:";
   rules.appendChild(rule1Text);
 
   const rule1Img = document.createElement("img");
-  rule1Img.src = "img/rule1.png";
-  rule1Img.alt = "ルール１";
+  rule1Img.src = "./img/rule1.png";
+  rule1Img.alt = "ルール1";
+  rule1Img.style.display = "block";
+  rule1Img.style.width = "100%";
+  rule1Img.style.height = "auto";
+  rule1Img.style.margin = "0 auto 30px";
   rules.appendChild(rule1Img);
 
+  // ルール2
   const rule2Text = document.createElement("p");
   rule2Text.textContent = "2:";
   rules.appendChild(rule2Text);
 
   const rule2Img = document.createElement("img");
-  rule2Img.src = "img/rule2.png";
-  rule2Img.alt = "ルール２";
+  rule2Img.src = "./img/rule2.png";
+  rule2Img.alt = "ルール2";
+  rule2Img.style.display = "block";
+  rule2Img.style.width = "100%";
+  rule2Img.style.height = "auto";
+  rule2Img.style.margin = "0 auto 30px";
   rules.appendChild(rule2Img);
 
   screen.appendChild(rules);
