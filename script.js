@@ -158,6 +158,10 @@ function renderSetup() {
   rule1Img.style.width = "100%";
   rule1Img.style.height = "auto";
   rule1Img.style.margin = "0 auto 30px";
+  rule1Img.style.border = "3px solid white";
+rule1Img.style.borderRadius = "8px";
+rule1Img.style.padding = "5px";
+rule1Img.style.backgroundColor = "white";
   rules.appendChild(rule1Img);
 
   // ルール2
@@ -172,6 +176,10 @@ function renderSetup() {
   rule2Img.style.width = "100%";
   rule2Img.style.height = "auto";
   rule2Img.style.margin = "0 auto 30px";
+  rule2Img.style.border = "3px solid white";
+  rule2Img.style.borderRadius = "8px";
+  rule2Img.style.padding = "5px";
+  rule2Img.style.backgroundColor = "white";
   rules.appendChild(rule2Img);
 
   screen.appendChild(rules);
