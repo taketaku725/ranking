@@ -148,7 +148,7 @@ function renderSetup() {
 
   // ルール1
   const rule1Text = document.createElement("p");
-  rule1Text.textContent = "1:";
+  rule1Text.textContent = "1:自分のターンになったら、お題に対して自分以外のプレイヤーの中から自分に入る票の数を予想しましょう。その上で、自分以外の誰かに投票しましょう。";
   rules.appendChild(rule1Text);
 
   const rule1Img = document.createElement("img");
@@ -159,14 +159,14 @@ function renderSetup() {
   rule1Img.style.height = "auto";
   rule1Img.style.margin = "0 auto 30px";
   rule1Img.style.border = "3px solid white";
-rule1Img.style.borderRadius = "8px";
-rule1Img.style.padding = "5px";
-rule1Img.style.backgroundColor = "white";
+  rule1Img.style.borderRadius = "8px";
+  rule1Img.style.padding = "5px";
+  rule1Img.style.backgroundColor = "white";
   rules.appendChild(rule1Img);
 
   // ルール2
   const rule2Text = document.createElement("p");
-  rule2Text.textContent = "2:";
+  rule2Text.textContent = "2:全員のターンが終了したら最後に２種類のランキングが表示されます。上側は純粋に得票数ランキングです。高いほどお題の人物であることを表します。下側は誤差ランキングです。お題に対しての自認が自惚れているか謙遜しているほど↑のランキングです。誤差の数だけ飲むなり、上位の人間が飲むなりお好きに楽しんでください。";
   rules.appendChild(rule2Text);
 
   const rule2Img = document.createElement("img");
