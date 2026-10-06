@@ -135,6 +135,33 @@ function renderSetup() {
     };
     screen.appendChild(btn);
   }
+
+  const rules = document.createElement("div");
+  rules.className = "rules";
+
+  const ruleTitle = document.createElement("h2");
+  ruleTitle.textContent = "【遊び方】";
+  rule.appendChild(rule1Text);
+
+  const rule1Text = document.createElement("p");
+  rule1Text.textContent = "1:";
+  rules.appendChild(rule1Text);
+
+  const rule1Img = document.createElement("img");
+  rule1Img.src = "img/rule1.png";
+  rule1Img.alt = "ルール１";
+  rules.appendChild(rule1Img);
+
+  const rule2Text = document.createElement("p");
+  rule2Text.textContent = "2:";
+  rules.appendChild(rule2Text);
+
+  const rule2Img = document.createElement("img");
+  rule2Img.src = "img/rule2.png";
+  rule2Img.alt = "ルール２";
+  rules.appendChild(rule2Img);
+
+  screen.appendChild(rules);
 }
 
 /* =======================
