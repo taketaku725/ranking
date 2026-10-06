@@ -141,7 +141,7 @@ function renderSetup() {
 
   const ruleTitle = document.createElement("h2");
   ruleTitle.textContent = "【遊び方】";
-  rules.appendChild(rule1Text);
+  rules.appendChild(ruleTitle);
 
   const rule1Text = document.createElement("p");
   rule1Text.textContent = "1:";
